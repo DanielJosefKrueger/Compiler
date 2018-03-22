@@ -2,3 +2,5 @@
 *.o
 *.iml
 lexmain
+*.xml
+CMakeLists.txt
