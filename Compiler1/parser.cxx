@@ -8,7 +8,7 @@
 #endif
 
 
-int lookahead;					/* lookahead enthält nächsten EIngabetoken */     
+int lookahead;					/* lookahead enthï¿½lt nï¿½chsten EIngabetoken */     
  
 
 int exp(); 
@@ -22,8 +22,8 @@ int nextsymbol();
 
 Schnittstelle: 
 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 							
 
 
@@ -41,14 +41,14 @@ int factor()
 	trace<<"\n Zeile:"<< lineno<<"	Faktor";
 
 
-	switch(lookahead)	// je nach nächstem Eingabesymbol in lookahead 
+	switch(lookahead)	// je nach nï¿½chstem Eingabesymbol in lookahead 
 	{
 		case KLAUF:	/* Symbol '(' folgt --> (EXPRESSION) erwartet*/  
 					
 					lookahead=nextsymbol();
 					exp();
 					if(lookahead== KLZU)	
-						// korrekt ; nächstes Symbol lesen --> Ende 
+						// korrekt ; nï¿½chstes Symbol lesen --> Ende 
 						lookahead = nextsymbol();
 					else 
 						error(27); // kein Faktor 
@@ -82,7 +82,7 @@ int factor()
 						/* nicht gefunden --> Fehler: Id nicht deklariert*/ 
 						error(10);
 
-					else	// Id in ST gefunden ; Art prüfen 
+					else	// Id in ST gefunden ; Art prï¿½fen 
 
 						{kind = found->token;	// Art des ST-Eintrags 
 						
@@ -109,7 +109,7 @@ int factor()
 						
 						} // endswitch (kind) 
 					
-					   // nächstes Symbol lesen 
+					   // nï¿½chstes Symbol lesen 
 						
 				       lookahead=nextsymbol();
 				     }	// endif 
@@ -138,8 +138,8 @@ int factor()
 			TERM	::=		FACTOR  { '*' FACTOR |  '/' FACTOR }*
 			
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 							Typ des Terms ist Funktionswert
 
 */ 
@@ -158,7 +158,7 @@ int term()
 	while(lookahead == MULT || lookahead ==DIV)
 		// solange * oder / folgt, muss Factor kommen
 		
-		{// nächstes Symbol lesen 
+		{// nï¿½chstes Symbol lesen 
 		 lookahead=nextsymbol();
 			ret = factor(); 
 		
@@ -176,8 +176,8 @@ int term()
 			EXPRESSION	::=		TERM { '+' TERM |  '-' TERM}*
 			
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 							Funktionswert ist Typ des Ausdrucks
 */ 
 
@@ -193,11 +193,11 @@ int exp()
 	while (lookahead == PLUS || lookahead == MINUS )
 			// solange + oder - folgt, muss Term kommen
 
-		{// nächstes Symbol lesen 
+		{// nï¿½chstes Symbol lesen 
 		 lookahead=nextsymbol();
-		 // Term prüfen 
+		 // Term prï¿½fen 
 		 typ_right = term();
-		 // nach korrektem Ende wurde nächstes Symbol gelesen 
+		 // nach korrektem Ende wurde nï¿½chstes Symbol gelesen 
 		
 		}
 	return (0);
@@ -212,8 +212,8 @@ int exp()
 			CONDITION	::=		EXPRESSION  RELOP  EXPRESSION
 			
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -237,7 +237,7 @@ int condition()
 		case LT:
 		case LE:
 		case GT:
-		case GE:// nächstes Symbol lesen 
+		case GE:// nï¿½chstes Symbol lesen 
 				lookahead=nextsymbol();
 				// Ausdruck muss folgen 
 				typ_right = exp();
@@ -268,8 +268,8 @@ int condition()
 
 
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -284,35 +284,80 @@ void statement()
       trace<<"\n Zeile:"<< lineno<<"Statement";
 
 
-  // Überprüfung des aktuellen lex. Symbols
+  // ï¿½berprï¿½fung des aktuellen lex. Symbols
 
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  switch(lookahead){
+      case ID:
+          lookahead = nextsymbol();
+          if(lookahead== ASS){
+              lookahead = nextsymbol();
+              exp();
+              return 0;
+          }else{
+              errortext("Kein ASSIGN nach ID in STATEMENT");
+          }
+
+      case CALL:
+          lookahead = nextsymbol();
+          if(lookahead ==ID){
+              l
+              //TODO check ist id deklariert
+              found = lookup(idname);
+              if(found == NULL){
+                  errortext("Procedure wurde nicht deklariert");
+              }
+              lookahead = nextsymbol();
+              return 0;
+          }else{
+              errortext("Kein ID nach CALL in STATEMENT");
+          }
+
+      case BEGIN:
+          statement();
+          //lookahead = nextsymbol();
+          while(lookahead==SEMICOLON){
+              statement();
+              //lookahead = nextsymbol();
+          }
+          if(lookahead==END){
+              lookahead=nextsymbol();
+              return 0;
+          }else{
+              errortext("Kein END nach BEGIN gefunden");
+          }
+
+
+      case IF:
+          lookahead = nextsymbol();
+          condition();
+          if(lookahead!=THEN){
+              statement();
+              lookahead =nextsymbol();
+          }else{
+              errortext("Kein THEN nach IF");
+          }
+          if(lookahead==ELSE){
+             lookahead=nextsymbol();
+              statement();
+          }
+          if(lookahead==END){
+              lookahead = nextsymbol();
+              return 0;
+          }else{
+              errortext("Kein END nach BEGIN");
+          }
+      case WHILE:
+            condition();
+            if(lookahead==DO){
+                statement();
+                return 0;
+            }else{
+                errortext("Kein DO nach WHILE");
+            }
+          case default:
+              errortext("STATEMENT find mit nicht bekannten Symbol an oder Fehler durch fall-through");
+  }
   
 
   return;	// end statement 
@@ -329,9 +374,9 @@ nach folgender Syntax:
 
 
 Schnittstelle: 
-	bei Aufruf :			erkannt wurde das Schlüsselwort procedure 
-							nächstes Eingabesymbol befindet sich in lookahead 
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlï¿½sselwort procedure 
+							nï¿½chstes Eingabesymbol befindet sich in lookahead 
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -389,9 +434,9 @@ nach folgender Syntax:
 			  
 				
 Schnittstelle: 
-	bei Aufruf :			erkannt wurde das Schlüsselwort var 
-							nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlï¿½sselwort var 
+							nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -452,9 +497,9 @@ nach folgender Syntax:
 			  
 				
 Schnittstelle: 
-	bei Aufruf :			erkannt wurde das Schlüsselwort const 
-							nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			erkannt wurde das Schlï¿½sselwort const 
+							nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -516,16 +561,16 @@ return;		// end constdecl
 Der Parameter neusym ist ein Zeiger auf die Symboltabelle des zu 
 analysierenden Blockes 
 ===> 
-		äussersten (globalen)  Block:		firstsym 
-		bei Prozeduren:		Zeiger auf neu angelegte ST für Prozedur 
+		ï¿½ussersten (globalen)  Block:		firstsym 
+		bei Prozeduren:		Zeiger auf neu angelegte ST fï¿½r Prozedur 
 		
 Zu Beginn muss der globale Zeiger actsym auf die neue ST gesetzt werden
 Vor Verlassen muss actsym wieder auf den vorigen Wert gesetzt werden
 
 				
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 
 */ 
@@ -560,7 +605,7 @@ void block(symtable * neusym)
 
 
 
-	// bei Blockende : Symboltabelle zurücksetzen 
+	// bei Blockende : Symboltabelle zurï¿½cksetzen 
 	// actsym = Zeiger auf vorherige Symboltabelle
 	
 	
@@ -586,8 +631,8 @@ return;		// end block
 
 				
 Schnittstelle: 
-	bei Aufruf :			nächstes Eingabesymbol befindet sich in lookahead
-	bei korrektem Ende:		nächstes Eingabesymbol befindet sich in lookahead
+	bei Aufruf :			nï¿½chstes Eingabesymbol befindet sich in lookahead
+	bei korrektem Ende:		nï¿½chstes Eingabesymbol befindet sich in lookahead
 
 */ 
 
@@ -611,7 +656,7 @@ void program()
 
 	//  nach Block muss '$' folgen 
 	if (lookahead == PROGEND)
-		// nächstes Symbol lesen 
+		// nï¿½chstes Symbol lesen 
 		lookahead=nextsymbol();
 	  
 	else 

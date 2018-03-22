@@ -196,24 +196,33 @@ int nextsymbol ()
 					int b = 0;				/* Zeichenzahl*/ 
 
 
+                    while(isdigit(actchar)){
+                        b++;
+                        zahl[b] = actchar;
+                        fin.get(actchar);
+                    }
 
+                    if(actchar != '.'){
+                        // zahl zuende; ist int zahl
+                        zahl[b+1] == '\0';
+                        num = atoi(zahl);
+                        return INTNUM;
+                    }else{
 
+                        // . gefunden => reale Zahl
+                        b++;
+                        zahl[b]=actchar;
+                        while(isdigit(actchar)){
+                            b++;
+                            zahl[b] = actchar;
+                            fin.get(actchar);
+                        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-					
-				
-					
+                        //reale zahl am ende
+                        zahl[b+1] == '\0';
+                        realnum = atof(zahl);
+                        return REALNUM;
+                    }
 				}
 
 
@@ -222,31 +231,27 @@ int nextsymbol ()
 					
 					
 			
-					int b = 0 ;				/* Zeichenzahl */ 
+					int b = 0 ;				/* Zeichenzahl */
+                    char buffer[30]; // buffer zum späteren erkennen des identifikators und zum testen, ob es ein Signalwort ist
 
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					    solange Buchstaben oder Ziffern folgen --> Identifikator */ 
-					
-					
+					idname[b] = actchar;
+
+					fin.get(actchar);
 					while((isalpha(actchar))||(isdigit(actchar))){
-
-
-
+                        b++;
+                        idname[b] = actchar;
 					}
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+                    idname[b+1]='\0'; //String sauber abschließen
+
+                    int ret = lookforres(buffer);
+                    if(ret !=0){ //signalwort erkannt, dieses returnen
+                        return ret;
+                    }else{
+                        return ID; // ID als Symbol returnen
+                    }
+
 
 				}
 
@@ -258,29 +263,50 @@ int nextsymbol ()
 				
 				switch(actchar)
 				{	case '=':	fin.get(actchar);
-								return(EQ);
+                        return(EQ);
+                    case '!':	fin.get(actchar);
+                        if(actchar=='='){
+                            return(NE);
+                        }
 
-					
+                    case '<':	fin.get(actchar);
+                        if(actchar=='='){
+                            return(LE);
+                        }else{
+                            return(LT);
+                        }
+                    case '>':	fin.get(actchar);
+                        if(actchar=='='){
+                            return(GE);
+                        }else{
+                            return(GT);
+                        }
+                    case ':':	fin.get(actchar);
+                        if(actchar=='='){
+                            return(ASS);
+                        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-			
-
-					default: 	error (32); 
-							
-				
+                    case ',':	fin.get(actchar);
+                        return(KOMMA);
+                    case ';':	fin.get(actchar);
+                        return(SEMICOLON);
+                    case '+':	fin.get(actchar);
+                        return(PLUS);
+                    case '-':	fin.get(actchar);
+                        return(MINUS);
+                    case '*':	fin.get(actchar);
+                        return(MULT);
+                    case '/':	fin.get(actchar);
+                        return(DIV);
+                    case '(':	fin.get(actchar);
+                        return(KLAUF);
+                    case ')':	fin.get(actchar);
+                        return(KLZU);
+                    case '$':	fin.get(actchar);
+                        return(PROGEND);
+                    case ':':	fin.get(actchar);
+                        return(KLZU);
+                    default: 	error (32);
 				} /* end-switch */ 
 		} /* end-else */ 
 
