@@ -293,7 +293,7 @@ void statement()
           if(lookahead== ASS){
               lookahead = nextsymbol();
               exp();
-              return 0;
+              return ;
           }else{
               errortext("Kein ASSIGN nach ID in STATEMENT");
           }
@@ -301,14 +301,14 @@ void statement()
       case CALL:
           lookahead = nextsymbol();
           if(lookahead ==ID){
-              l
+
               //TODO check ist id deklariert
               found = lookup(idname);
               if(found == NULL){
                   errortext("Procedure wurde nicht deklariert");
               }
               lookahead = nextsymbol();
-              return 0;
+              return ;
           }else{
               errortext("Kein ID nach CALL in STATEMENT");
           }
@@ -322,7 +322,7 @@ void statement()
           }
           if(lookahead==END){
               lookahead=nextsymbol();
-              return 0;
+              return ;
           }else{
               errortext("Kein END nach BEGIN gefunden");
           }
@@ -341,22 +341,22 @@ void statement()
              lookahead=nextsymbol();
               statement();
           }
-          if(lookahead==END){
+          if(lookahead==FI){
               lookahead = nextsymbol();
-              return 0;
+              return ;
           }else{
-              errortext("Kein END nach BEGIN");
+              errortext("Kein FI nach IF");
           }
       case WHILE:
             condition();
             if(lookahead==DO){
                 statement();
-                return 0;
+                return ;
             }else{
                 errortext("Kein DO nach WHILE");
             }
-          case default:
-              errortext("STATEMENT find mit nicht bekannten Symbol an oder Fehler durch fall-through");
+           default:
+              errortext("STATEMENT fängt mit nicht bekannten Symbol an oder Fehler durch fall-through");
   }
   
 
@@ -393,34 +393,22 @@ void procdecl()
    if (tracesw) 
 	    trace<<"\n Zeile:"<< lineno<<"Procdeklaration:";
 
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
 
+	// falls als nächstes kein Identifikator kommt => Fehler
+   if(lookahead != ID){
+	   errortext("Keine Prozedurebezeichnung nach \"procedure\"");
+   }
+   
+   lookahead = nextsymbol();
+    if(lookahead!=SEMICOLON){
+        errortext("Fehler: Semiclon nach procdure erwartet");
+    }
+    lookahead = nextsymbol();
+    symtable * next =  create_newsym();
+    block(next);
+    if(lookahead!=SEMICOLON){
+        errortext("Nach Prozedurblock muss ein ; folgen");
+    }
    return;   // end procdecl 
 }
 
@@ -452,33 +440,58 @@ void vardecl()
     
 	// nach var muss Identifikator folgen 
 
+   if(lookahead != ID){
+       errortext("Nach var muss ein Identifikator für die Variable folgen");
+   }
 
 
+    lookahead = nextsymbol();
+    if(lookahead!=COLON){
+        errortext("Doppelpunkt nach Variablenidentifikator erwartet");
+    }
+
+    lookahead = nextsymbol();
+    if(lookahead==REAL){
+        //todo real variable merken
+
+    }else if(lookahead==INT){
+        //todo int variable merken
+
+    }else{
+        errortext("INT or REAL nach Doppelpunkt in Variablendeklaration erwartet");
+    }
 
 
+    while(lookahead == KOMMA){
+
+        if(lookahead != ID){
+            errortext("Nach var muss ein Identifikator für die Variable folgen");
+        }
 
 
+        lookahead = nextsymbol();
+        if(lookahead!=COLON){
+            errortext("Doppelpunkt nach Variablenidentifikator erwartet");
+        }
 
+        lookahead = nextsymbol();
+        if(lookahead==REAL){
+            //todo real variable merken
 
+        }else if(lookahead==INT){
+            //todo int variable merken
 
+        }else{
+            errortext("INT or REAL nach Doppelpunkt in Variablendeklaration erwartet");
+        }
+        lookahead = nextsymbol();
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if(lookahead!=SEMICOLON){
+        errortext("Semicolon am Ende einer Var Deklaration erwartet");
+    }
+    lookahead = nextsymbol();
 return ;	// ende vardecl
-   
 } 
 
 
@@ -516,31 +529,65 @@ void constdecl()
 	
 	// auf const muss IDENT folgen 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	//test wegen Identifikator
+	if(lookahead!=ID){
+        errortext("Auf eine Konstantendeklaration muss ein Identifikator folgen!");
+    }
 
+    found = lookup_in_actsym(idname);
+    if(found !=NULL){
+        errortext("Prozedurname wird bereits verwendet!");
+    }
+
+    //test wegen Zuweisungszeichen
+    lookahead = nextsymbol();
+    if(lookahead!=ASS){
+        errortext("Assignment nach Identifikator bei Konstantendefinition erwartet");
+    }
+
+    //test wegen Zahl
+    lookahead = nextsymbol();
+    if(lookahead!=INTNUM){
+        errortext("Integer Nummer in Konstantendeklaration erwartet");
+    }
+
+
+    lookahead = nextsymbol();
+    while(lookahead==KOMMA){
+        //Test auf Identifikator
+        lookahead=nextsymbol();
+        if(lookahead!=ID){
+            errortext("Auf eine Konstantendeklaration muss ein Identifikator folgen!");
+        }
+        found = lookup_in_actsym(idname);
+        if(found !=NULL){
+            errortext("Prozedurname wird bereits verwendet!");
+        }
+
+
+
+        //test auf Zuweisungszeichen
+        lookahead = nextsymbol();
+        if(lookahead!=ASS){
+            errortext("Assignment nach Identifikator bei Konstantendefinition erwartet");
+        }
+
+        //test wegen Zahl
+        lookahead = nextsymbol();
+        if(lookahead!=INTNUM){
+            errortext("Integer Nummer in Konstantendeklaration erwartet");
+        }
+
+
+        //nächstes Symbol einlesen
+        lookahead = nextsymbol();
+    }
+    //nun muss ein semi colon kommen
+    if(lookahead!=SEMICOLON){
+        errortext("Semicolon am Ende einer Konstantendeklarationerwartet");
+    }
+    lookahead = nextsymbol();
 return;		// end constdecl
-
- 
 } 
 
 
@@ -588,7 +635,23 @@ void block(symtable * neusym)
 	trace<<"\n Zeile:"<< lineno<<"Block";
 
 	// actsym auf neue Symboltabelle setzen 
-	
+
+    symtable* tmp =  actsym;
+    actsym = neusym;
+
+
+    if(lookahead==CONST){
+        constdecl();
+    }
+    if(lookahead==VAR){
+        vardecl();
+    }
+    if(lookahead==PROCEDURE){
+        procdecl();
+    }
+    statement();
+
+
 
 
 
@@ -607,7 +670,7 @@ void block(symtable * neusym)
 
 	// bei Blockende : Symboltabelle zur�cksetzen 
 	// actsym = Zeiger auf vorherige Symboltabelle
-	
+	actsym = tmp;
 	
 	
 	

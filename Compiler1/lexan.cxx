@@ -120,12 +120,13 @@ liest das erste Zeichen aus der Eingabe */
 
 void initlexan()
 
-{ num = NONE;						
+{
+    num = NONE;
   realnum = 0.0; 
   idname [0] = '\0';					
   lineno = 1;
   fin.get(actchar);			/* Erstes Zeichen der Eingabe lesen */  
-    
+    cout <<" Lexan wurde erfolgreich initialisiert" <<endl;
 }    
 
 
@@ -164,6 +165,7 @@ void initlexan()
 int nextsymbol () 
 
 {
+    cout<< "nextsymbol() called" << endl << std::flush;;
 	int token;  
 	char lexbuf[BSIZE] ;		/* lokaler Puffer f�r Eingabezeichen */ 	
 
@@ -175,6 +177,7 @@ int nextsymbol ()
 		if ( actchar== ' ' || actchar== '\t')
 			/*Blank und Tab in Ausgabedatei kopieren und �berlesen */ 
 			{	fout.put(actchar);
+
 				fin.get(actchar);
 				
 		     }
@@ -191,36 +194,37 @@ int nextsymbol ()
 		else if (isdigit(actchar))
 
 				{ /***** actchar ist Ziffer --> Konstanten erkennen  *****/
-					
-					char zahl [BSIZE];		/* Puffer f�r Ziffern */ 
+                    cout << "Zahl am Anfang erkannt" << std::flush;
+						/* Puffer f�r Ziffern */
 					int b = 0;				/* Zeichenzahl*/ 
 
 
-                    while(isdigit(actchar)){
+                    while(!fin.eof() && isdigit(actchar)){
                         b++;
-                        zahl[b] = actchar;
+                        lexbuf[b] = actchar;
                         fin.get(actchar);
                     }
 
                     if(actchar != '.'){
                         // zahl zuende; ist int zahl
-                        zahl[b+1] == '\0';
-                        num = atoi(zahl);
+                        lexbuf[b+1] = '\0';
+                        num = atoi(lexbuf);
                         return INTNUM;
                     }else{
 
                         // . gefunden => reale Zahl
                         b++;
-                        zahl[b]=actchar;
-                        while(isdigit(actchar)){
+                        lexbuf[b]=actchar;
+                        fin.get(actchar);
+                        while(!fin.eof() && isdigit(actchar)){
                             b++;
-                            zahl[b] = actchar;
+                            lexbuf[b] = actchar;
                             fin.get(actchar);
                         }
 
                         //reale zahl am ende
-                        zahl[b+1] == '\0';
-                        realnum = atof(zahl);
+                        lexbuf[b+1] = '\0';
+                        realnum = atof(lexbuf);
                         return REALNUM;
                     }
 				}
@@ -232,20 +236,21 @@ int nextsymbol ()
 					
 			
 					int b = 0 ;				/* Zeichenzahl */
-                    char buffer[30]; // buffer zum späteren erkennen des identifikators und zum testen, ob es ein Signalwort ist
+
 
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					    solange Buchstaben oder Ziffern folgen --> Identifikator */ 
 					idname[b] = actchar;
 
 					fin.get(actchar);
-					while((isalpha(actchar))||(isdigit(actchar))){
+					while((!fin.eof()) && (isalpha(actchar)||(isdigit(actchar)))){
                         b++;
                         idname[b] = actchar;
+                        fin.get(actchar);
 					}
                     idname[b+1]='\0'; //String sauber abschließen
 
-                    int ret = lookforres(buffer);
+                    int ret = lookforres(idname);
                     if(ret !=0){ //signalwort erkannt, dieses returnen
                         return ret;
                     }else{
@@ -266,24 +271,30 @@ int nextsymbol ()
                         return(EQ);
                     case '!':	fin.get(actchar);
                         if(actchar=='='){
+                            fin.get(actchar);
                             return(NE);
                         }
 
                     case '<':	fin.get(actchar);
                         if(actchar=='='){
+                            fin.get(actchar);
                             return(LE);
                         }else{
                             return(LT);
                         }
                     case '>':	fin.get(actchar);
                         if(actchar=='='){
+                            fin.get(actchar);
                             return(GE);
                         }else{
                             return(GT);
                         }
                     case ':':	fin.get(actchar);
                         if(actchar=='='){
+                            fin.get(actchar);
                             return(ASS);
+                        }else{
+                            return COLON;
                         }
 
                     case ',':	fin.get(actchar);
@@ -304,8 +315,6 @@ int nextsymbol ()
                         return(KLZU);
                     case '$':	fin.get(actchar);
                         return(PROGEND);
-                    case ':':	fin.get(actchar);
-                        return(KLZU);
                     default: 	error (32);
 				} /* end-switch */ 
 		} /* end-else */ 

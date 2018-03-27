@@ -26,11 +26,12 @@ int main()
 {
 	int lookahead = -1; 
 
-	/* Initialisierungen der lexikalischen Analyse durchführen */
+	/* Initialisierungen der lexikalischen Analyse durchfï¿½hren */
 	initialize(); 
 
 	/* 1. Symbol lesen  */ 
-		
+	cout << "Beginne mit lexikalischer Analyse" << endl << std::flush;
+
 	lookahead = nextsymbol();
   
 	/* Symbol ausgeben */ 
@@ -40,7 +41,7 @@ int main()
   while (lookahead != DONE)
 	{ 	
 		lookahead = nextsymbol();
-		fout << "		Tokentyp=    " <<lookahead; 
+		fout << "		Tokentyp=    " << lookahead;
 
  	}
 
