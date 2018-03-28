@@ -165,7 +165,7 @@ void initlexan()
 int nextsymbol () 
 
 {
-    cout<< "nextsymbol() called" << endl << std::flush;;
+    //cout<< "nextsymbol() called" << endl << std::flush;;
 	int token;  
 	char lexbuf[BSIZE] ;		/* lokaler Puffer f�r Eingabezeichen */ 	
 
@@ -194,14 +194,14 @@ int nextsymbol ()
 		else if (isdigit(actchar))
 
 				{ /***** actchar ist Ziffer --> Konstanten erkennen  *****/
-                    cout << "Zahl am Anfang erkannt" << std::flush;
+                    //cout << "Zahl am Anfang erkannt" << std::flush;
 						/* Puffer f�r Ziffern */
-					int b = 0;				/* Zeichenzahl*/ 
-
+					int b = 0;				/* Zeichenzahl*/
 
                     while(!fin.eof() && isdigit(actchar)){
                         b++;
                         lexbuf[b] = actchar;
+                        fout.put(actchar);
                         fin.get(actchar);
                     }
 
@@ -215,6 +215,7 @@ int nextsymbol ()
                         // . gefunden => reale Zahl
                         b++;
                         lexbuf[b]=actchar;
+                        fout.put(actchar);
                         fin.get(actchar);
                         while(!fin.eof() && isdigit(actchar)){
                             b++;
@@ -241,12 +242,14 @@ int nextsymbol ()
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
 					    solange Buchstaben oder Ziffern folgen --> Identifikator */ 
 					idname[b] = actchar;
-
+                    fout.put(actchar);
 					fin.get(actchar);
 					while((!fin.eof()) && (isalpha(actchar)||(isdigit(actchar)))){
                         b++;
                         idname[b] = actchar;
+                        fout.put(actchar);
                         fin.get(actchar);
+
 					}
                     idname[b+1]='\0'; //String sauber abschließen
 
@@ -271,6 +274,7 @@ int nextsymbol ()
                         return(EQ);
                     case '!':	fin.get(actchar);
                         if(actchar=='='){
+                            fout.put(actchar);
                             fin.get(actchar);
                             return(NE);
                         }

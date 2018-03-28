@@ -302,7 +302,6 @@ void statement()
           lookahead = nextsymbol();
           if(lookahead ==ID){
 
-              //TODO check ist id deklariert
               found = lookup(idname);
               if(found == NULL){
                   errortext("Procedure wurde nicht deklariert");
@@ -314,9 +313,11 @@ void statement()
           }
 
       case BEGIN:
+          lookahead = nextsymbol();
           statement();
           //lookahead = nextsymbol();
           while(lookahead==SEMICOLON){
+              lookahead = nextsymbol();
               statement();
               //lookahead = nextsymbol();
           }
@@ -328,13 +329,16 @@ void statement()
           }
 
 
+
+
       case IF:
           lookahead = nextsymbol();
           condition();
-          if(lookahead!=THEN){
+          if(lookahead==THEN){
+              lookahead = nextsymbol();
               statement();
-              lookahead =nextsymbol();
           }else{
+              cout << "Falsches Symbol: " << lookahead << " then erwartet";
               errortext("Kein THEN nach IF");
           }
           if(lookahead==ELSE){
@@ -348,14 +352,17 @@ void statement()
               errortext("Kein FI nach IF");
           }
       case WHILE:
+            lookahead = nextsymbol();
             condition();
             if(lookahead==DO){
+                lookahead = nextsymbol();
                 statement();
                 return ;
             }else{
                 errortext("Kein DO nach WHILE");
             }
            default:
+               cout << "Unbekanner Anfnag eines Statements " << lookahead;
               errortext("STATEMENT fängt mit nicht bekannten Symbol an oder Fehler durch fall-through");
   }
   
@@ -387,17 +394,22 @@ void procdecl()
 
 {  st_entry * neu, *found;          // Zeiger auf ST-Eintrag 
   
-   symtable * neusym;		// Zeiger auf Symboltabelle 
-
+   symtable * neusym;		// Zeiger auf Symboltabelle
 
    if (tracesw) 
 	    trace<<"\n Zeile:"<< lineno<<"Procdeklaration:";
 
 
+    lookahead = nextsymbol();
 	// falls als nächstes kein Identifikator kommt => Fehler
    if(lookahead != ID){
 	   errortext("Keine Prozedurebezeichnung nach \"procedure\"");
    }
+
+    // Prozedur merken
+    insert(PROC);
+
+
    
    lookahead = nextsymbol();
     if(lookahead!=SEMICOLON){
@@ -409,6 +421,8 @@ void procdecl()
     if(lookahead!=SEMICOLON){
         errortext("Nach Prozedurblock muss ein ; folgen");
     }
+    lookahead = nextsymbol();
+
    return;   // end procdecl 
 }
 
@@ -440,10 +454,14 @@ void vardecl()
     
 	// nach var muss Identifikator folgen 
 
+    lookahead = nextsymbol();
    if(lookahead != ID){
        errortext("Nach var muss ein Identifikator für die Variable folgen");
    }
 
+    char id_saver[100];
+    strcpy(id_saver, idname);
+    cout << "identifikator: " <<id_saver<< endl;
 
     lookahead = nextsymbol();
     if(lookahead!=COLON){
@@ -452,22 +470,29 @@ void vardecl()
 
     lookahead = nextsymbol();
     if(lookahead==REAL){
-        //todo real variable merken
+        //real variable merken
+        strcpy(idname, id_saver);
+        insert(REALIDENT);
+
 
     }else if(lookahead==INT){
-        //todo int variable merken
+        //int variable merken
+        strcpy(idname, id_saver);
+        insert(INTIDENT);
 
     }else{
         errortext("INT or REAL nach Doppelpunkt in Variablendeklaration erwartet");
     }
 
-
+    lookahead = nextsymbol();
     while(lookahead == KOMMA){
 
+        lookahead = nextsymbol();
         if(lookahead != ID){
             errortext("Nach var muss ein Identifikator für die Variable folgen");
         }
-
+        strcpy(id_saver, idname);
+        cout << "identifikator: " <<id_saver<< endl;
 
         lookahead = nextsymbol();
         if(lookahead!=COLON){
@@ -476,15 +501,17 @@ void vardecl()
 
         lookahead = nextsymbol();
         if(lookahead==REAL){
-            //todo real variable merken
-
+            //real variable merken
+            strcpy(idname, id_saver);
+            insert(REALIDENT);
         }else if(lookahead==INT){
-            //todo int variable merken
-
+            //int variable merken
+            strcpy(idname, id_saver);
+            insert(INTIDENT);
         }else{
             errortext("INT or REAL nach Doppelpunkt in Variablendeklaration erwartet");
         }
-        lookahead = nextsymbol();
+        lookahead = nextsymbol(); // komma oder ; lesen
     }
 
     if(lookahead!=SEMICOLON){
@@ -528,21 +555,26 @@ void constdecl()
 	    trace<<"\n Zeile:"<< lineno<<"Konstantendeklaration:";
 	
 	// auf const muss IDENT folgen 
-	
+	lookahead = nextsymbol();
 	//test wegen Identifikator
 	if(lookahead!=ID){
         errortext("Auf eine Konstantendeklaration muss ein Identifikator folgen!");
     }
 
     found = lookup_in_actsym(idname);
+    cout << "Neue Konstante: " <<idname <<endl;
     if(found !=NULL){
         errortext("Prozedurname wird bereits verwendet!");
     }
+    //Konstante in symboltabelle eintragen
+    insert(KONST);
+
 
     //test wegen Zuweisungszeichen
     lookahead = nextsymbol();
-    if(lookahead!=ASS){
-        errortext("Assignment nach Identifikator bei Konstantendefinition erwartet");
+    cout << lookahead<<endl;
+    if(lookahead!=EQ){
+        errortext("EQ nach Identifikator bei Konstantendefinition erwartet");
     }
 
     //test wegen Zahl
@@ -651,32 +683,10 @@ void block(symtable * neusym)
     }
     statement();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// bei Blockende : Symboltabelle zur�cksetzen 
 	// actsym = Zeiger auf vorherige Symboltabelle
 	actsym = tmp;
-	
-	
-	
-	
-	
-	
+
 return;		// end block 
 }
 
