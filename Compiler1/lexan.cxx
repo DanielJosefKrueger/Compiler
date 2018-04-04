@@ -157,9 +157,12 @@ void initlexan()
 									Suche in restable 
 		- Operatoren,Sonderzeichen :entsprechende Token 
 
-**/ 
-										
+**/
 
+void read_and_write(){
+    fout.put(actchar);
+    fin.get(actchar);
+}
 
 
 int nextsymbol () 
@@ -176,17 +179,13 @@ int nextsymbol ()
 
 		if ( actchar== ' ' || actchar== '\t')
 			/*Blank und Tab in Ausgabedatei kopieren und �berlesen */ 
-			{	fout.put(actchar);
-
-				fin.get(actchar);
-				
+			{	read_and_write();
 		     }
 
 
 		else if (actchar== '\n'  ||  actchar == '\r')  
 			/* Newline in Ausgabedatei kopieren, �berlesen/entfernen, Zeilennummer erh�hen */ 
-			{ fout.put(actchar);
-			  fin.get(actchar);
+			{ read_and_write();
 			  lineno++;
 			  }
 
@@ -199,32 +198,27 @@ int nextsymbol ()
 					int b = 0;				/* Zeichenzahl*/
 
                     while(!fin.eof() && isdigit(actchar)){
-                        b++;
-                        lexbuf[b] = actchar;
-                        fout.put(actchar);
-                        fin.get(actchar);
+
+                        lexbuf[b++] = actchar;
+                        read_and_write();
                     }
 
                     if(actchar != '.'){
                         // zahl zuende; ist int zahl
-                        lexbuf[b+1] = '\0';
+                        lexbuf[b] = '\0';
                         num = atoi(lexbuf);
                         return INTNUM;
                     }else{
-
                         // . gefunden => reale Zahl
-                        b++;
-                        lexbuf[b]=actchar;
-                        fout.put(actchar);
-                        fin.get(actchar);
+                        lexbuf[b++]=actchar;
+                        read_and_write();
                         while(!fin.eof() && isdigit(actchar)){
-                            b++;
-                            lexbuf[b] = actchar;
-                            fin.get(actchar);
+                            lexbuf[b++] = actchar;
+                            read_and_write();
                         }
 
                         //reale zahl am ende
-                        lexbuf[b+1] = '\0';
+                        lexbuf[b] = '\0';
                         realnum = atof(lexbuf);
                         return REALNUM;
                     }
@@ -240,23 +234,22 @@ int nextsymbol ()
 
 
 					/* reg. Ausdruck   letter (letter|digit)*  erkennen ==>
-					    solange Buchstaben oder Ziffern folgen --> Identifikator */ 
-					idname[b] = actchar;
-                    fout.put(actchar);
-					fin.get(actchar);
+					    solange Buchstaben oder Ziffern folgen --> Identifikator */
+                    lexbuf[b++] = actchar;
+                    read_and_write();
 					while((!fin.eof()) && (isalpha(actchar)||(isdigit(actchar)))){
-                        b++;
-                        idname[b] = actchar;
-                        fout.put(actchar);
-                        fin.get(actchar);
+
+                        lexbuf[b++] = actchar;
+                        read_and_write();
 
 					}
-                    idname[b+1]='\0'; //String sauber abschließen
+                    lexbuf[b]='\0'; //String sauber abschließen
 
-                    int ret = lookforres(idname);
+                    int ret = lookforres(lexbuf);
                     if(ret !=0){ //signalwort erkannt, dieses returnen
                         return ret;
                     }else{
+                        strcpy(idname, lexbuf);
                         return ID; // ID als Symbol returnen
                     }
 
@@ -267,57 +260,56 @@ int nextsymbol ()
 		
 
 		else    
-			{fout.put(actchar);				/* Zeichen in Ausgabedatei */ 
+			{			/* Zeichen in Ausgabedatei */
 				
 				switch(actchar)
-				{	case '=':	fin.get(actchar);
+				{	case '=':	read_and_write();
                         return(EQ);
-                    case '!':	fin.get(actchar);
+                    case '!':	read_and_write();
                         if(actchar=='='){
-                            fout.put(actchar);
-                            fin.get(actchar);
+                            read_and_write();
                             return(NE);
                         }
 
-                    case '<':	fin.get(actchar);
+                    case '<':	read_and_write();
                         if(actchar=='='){
-                            fin.get(actchar);
+                            read_and_write();
                             return(LE);
                         }else{
                             return(LT);
                         }
-                    case '>':	fin.get(actchar);
+                    case '>':	read_and_write();
                         if(actchar=='='){
-                            fin.get(actchar);
+                            read_and_write();
                             return(GE);
                         }else{
                             return(GT);
                         }
-                    case ':':	fin.get(actchar);
+                    case ':':	read_and_write();
                         if(actchar=='='){
-                            fin.get(actchar);
+                            read_and_write();
                             return(ASS);
                         }else{
                             return COLON;
                         }
 
-                    case ',':	fin.get(actchar);
+                    case ',':	read_and_write();
                         return(KOMMA);
-                    case ';':	fin.get(actchar);
+                    case ';':	read_and_write();
                         return(SEMICOLON);
-                    case '+':	fin.get(actchar);
+                    case '+':	read_and_write();
                         return(PLUS);
-                    case '-':	fin.get(actchar);
+                    case '-':	read_and_write();
                         return(MINUS);
-                    case '*':	fin.get(actchar);
+                    case '*':	read_and_write();
                         return(MULT);
-                    case '/':	fin.get(actchar);
+                    case '/':	read_and_write();
                         return(DIV);
-                    case '(':	fin.get(actchar);
+                    case '(':	read_and_write();
                         return(KLAUF);
-                    case ')':	fin.get(actchar);
+                    case ')':	read_and_write();
                         return(KLZU);
-                    case '$':	fin.get(actchar);
+                    case '$':	read_and_write();
                         return(PROGEND);
                     default: 	error (32);
 				} /* end-switch */ 
@@ -330,5 +322,11 @@ int nextsymbol ()
  	return(DONE); 	/* EIngabe -Ende erreicht */ 
 		
 }
+
+
+
+
+
+
 
 

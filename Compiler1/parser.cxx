@@ -58,7 +58,7 @@ int factor()
 		case INTNUM:
 		 			/* Int-Zahl (INTNUMBER) gefunden --> okay */
 					lookahead=nextsymbol();
-					
+                    cout << "Wert von num: " << num << endl;
 					break;
 
 
@@ -289,6 +289,11 @@ void statement()
   
   switch(lookahead){
       case ID:
+          found = lookup(idname);
+          if(found == NULL){
+              errortext("Variable wurde nicht deklariert");
+          }
+
           lookahead = nextsymbol();
           if(lookahead== ASS){
               lookahead = nextsymbol();
@@ -407,8 +412,9 @@ void procdecl()
    }
 
     // Prozedur merken
-    insert(PROC);
-
+    found = insert(PROC);
+    //TODO echt strange, neue SymTable wird ja in symbol erzeugt und so kommt man ran
+    neusym =  found->subsym;
 
    
    lookahead = nextsymbol();
@@ -416,8 +422,8 @@ void procdecl()
         errortext("Fehler: Semiclon nach procdure erwartet");
     }
     lookahead = nextsymbol();
-    symtable * next =  create_newsym();
-    block(next);
+
+    block(neusym);
     if(lookahead!=SEMICOLON){
         errortext("Nach Prozedurblock muss ein ; folgen");
     }
@@ -458,6 +464,7 @@ void vardecl()
    if(lookahead != ID){
        errortext("Nach var muss ein Identifikator für die Variable folgen");
    }
+
 
     char id_saver[100];
     strcpy(id_saver, idname);
@@ -564,10 +571,10 @@ void constdecl()
     found = lookup_in_actsym(idname);
     cout << "Neue Konstante: " <<idname <<endl;
     if(found !=NULL){
-        errortext("Prozedurname wird bereits verwendet!");
+        errortext("Konstantenidentifikator wird bereits verwendet!");
     }
     //Konstante in symboltabelle eintragen
-    insert(KONST);
+
 
 
     //test wegen Zuweisungszeichen
@@ -582,8 +589,8 @@ void constdecl()
     if(lookahead!=INTNUM){
         errortext("Integer Nummer in Konstantendeklaration erwartet");
     }
-
-
+    cout << "Wert in num: " << num << endl;
+    insert(KONST);
     lookahead = nextsymbol();
     while(lookahead==KOMMA){
         //Test auf Identifikator
@@ -593,14 +600,14 @@ void constdecl()
         }
         found = lookup_in_actsym(idname);
         if(found !=NULL){
-            errortext("Prozedurname wird bereits verwendet!");
+            errortext("Konstantenidentifikator wird bereits verwendet!");
         }
 
 
 
         //test auf Zuweisungszeichen
         lookahead = nextsymbol();
-        if(lookahead!=ASS){
+        if(lookahead!=EQ){
             errortext("Assignment nach Identifikator bei Konstantendefinition erwartet");
         }
 
@@ -609,8 +616,8 @@ void constdecl()
         if(lookahead!=INTNUM){
             errortext("Integer Nummer in Konstantendeklaration erwartet");
         }
-
-
+        cout << "Wert in num: " << num << endl;
+        insert(KONST);
         //nächstes Symbol einlesen
         lookahead = nextsymbol();
     }

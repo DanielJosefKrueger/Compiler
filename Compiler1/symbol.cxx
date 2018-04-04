@@ -195,17 +195,21 @@ Rückgabe ist ein Zeiger auf den neuen ST-EIntrag
 	switch(tok)							/* Art eintragen abhängig von tok */ 
     
 	{	case KONST : /* Bei Konstante: Wert eintragen */ 
-    				neu.wertaddr = num; 
+    				neu.wertaddr = num;
+           			 trace<<"\n Zeile:"<< lineno<<" in insert KONSTANT with id: " << idname << " and value: " << num;
+           			 trace<<"\n Aktuelle Anzahl in Tabelle: " << actsym->anzahl+1 << " with level" << actsym->level;
     				break; 
     
 		case INTIDENT:   /* Bei Identifikator vom Typ int */ 
 					neu.wertaddr = 0; 
-				    trace<<"\n Zeile:"<< lineno<<" in insert INTIDENT";
+				    trace<<"\n Zeile:"<< lineno<<" in insert INTIDENT with id: " << idname ;
+					trace<<"\n Aktuelle Anzahl in Tabelle: " << actsym->anzahl+1 << " with level" << actsym->level;
 					break; 
 
 		case REALIDENT:   /* Bei Identifikator vom Typ real  */ 
 					neu.wertaddr = 0; 
-				    trace<<"\n Zeile:"<< lineno<<" in insert REALIDENT";
+				    trace<<"\n Zeile:"<< lineno<<" in insert REALIDENT with id: " << idname;
+					trace<<"\n Aktuelle Anzahl in Tabelle: "<< actsym->anzahl+1 << " with level" << actsym->level;
       				break; 
 
 		
