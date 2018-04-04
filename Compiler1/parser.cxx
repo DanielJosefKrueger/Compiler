@@ -294,6 +294,10 @@ void statement()
               errortext("Variable wurde nicht deklariert");
           }
 
+          if(!((found->token == INTIDENT) || (found->token == REALIDENT))){
+              errortext("Linker Operator einer Wertzuweisung muss eine Variable sein");
+          }
+
           lookahead = nextsymbol();
           if(lookahead== ASS){
               lookahead = nextsymbol();
@@ -310,6 +314,9 @@ void statement()
               found = lookup(idname);
               if(found == NULL){
                   errortext("Procedure wurde nicht deklariert");
+              }
+              if(found->token != PROC){
+                  errortext("Nach call muss eine deklarierte Procedure kommen");
               }
               lookahead = nextsymbol();
               return ;
@@ -429,6 +436,10 @@ void procdecl()
     }
     lookahead = nextsymbol();
 
+    if(lookahead == PROCEDURE){
+        procdecl();
+    }
+
    return;   // end procdecl 
 }
 
@@ -470,6 +481,13 @@ void vardecl()
     strcpy(id_saver, idname);
     cout << "identifikator: " <<id_saver<< endl;
 
+
+    found = lookup_in_actsym(id_saver);
+    if(found!=NULL){
+        errortext("Identifikator doppelt deklariert" );
+    }
+
+
     lookahead = nextsymbol();
     if(lookahead!=COLON){
         errortext("Doppelpunkt nach Variablenidentifikator erwartet");
@@ -500,6 +518,12 @@ void vardecl()
         }
         strcpy(id_saver, idname);
         cout << "identifikator: " <<id_saver<< endl;
+
+        found = lookup_in_actsym(id_saver);
+        if(found!=NULL){
+            errortext("Identifikator doppelt deklariert" );
+        }
+
 
         lookahead = nextsymbol();
         if(lookahead!=COLON){
@@ -640,7 +664,7 @@ return;		// end constdecl
 		BLOCK		::= 	[ CONSTDECL ]
 							[ VARDECL ]
 							  PROCDECL 
-							STATEMENT 
+							   STATEMENT
 
 
 
